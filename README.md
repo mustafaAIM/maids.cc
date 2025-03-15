@@ -60,7 +60,7 @@ maids/
 
    ```bash
    git clone <repository-url>
-   cd maids
+   cd maids.cc
    ```
 
 2. **Start the application with Docker Compose**
