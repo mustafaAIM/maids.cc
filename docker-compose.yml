@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  maids_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ./entrypoint-django.sh
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - maids_db
+    volumes:
+      - .:/app
+      - static_volume_maids:/app/static
+      - media_volume_maids:/app/media
+    container_name: maids_app
+    networks:
+      - maids_network
+
+  maids_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data_maids:/var/lib/postgresql/data
+    container_name: maids_db
+    networks:
+      - maids_network
+
+  pgadmin_maids:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5051:80"
+    depends_on:
+      - maids_db
+    container_name: maids_pgadmin
+    networks:
+      - maids_network
+
+  redis_maids:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_maids:/data
+    container_name: maids_redis
+    networks:
+      - maids_network
+
+networks:
+  maids_network:
+    name: maids_network
+
+volumes:
+  postgres_data_maids:
+  static_volume_maids:
+  media_volume_maids:
+  redis_data_maids: 
